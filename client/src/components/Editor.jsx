@@ -1,21 +1,34 @@
 import Quill from "quill"
 import 'quill/dist/quill.snow.css'
-import { useCallback } from "react"
+import { useCallback, useState, useEffect } from "react"
 import './Editor.css'
+import { io } from 'socket.io-client'
+
+const ToolBar_Option = [
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    [{ font: [] }],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["bold", "italic", 'underline'],
+    [{ color: [] }, { background: [] }],
+    [{ script: "sub" }, { script: 'super' }],
+    [{ align: [] }],
+    ["image", "blockquote", "code-block"],
+    ["clean"]
+]
+
 
 export default function Editor() {
+    const [socket, setSocket] = useState();
+    const [quill, setQuill] = useState();
 
-    const ToolBar_Option = [
-        [{ header: [1, 2, 3, 4, 5, 6, false] }],
-        [{ font: [] }],
-        [{ list: "ordered" }, { list: "bullet" }],
-        ["bold", "italic", 'underline'],
-        [{ color: [] }, { background: [] }],
-        [{ script: "sub" }, { script: 'super' }],
-        [{ align: [] }],
-        ["image", "blockquote", "code-block"],
-        ["clean"]
-    ]
+    useEffect(() => {
+        const socket = io('http://localhost:5000');
+
+        setSocket(socket);
+        return () => {
+            socket.disconnect();
+        }
+    }, [])
 
     const wrapperRef = useCallback(wrapper => {
 
@@ -33,8 +46,10 @@ export default function Editor() {
 
         const editor = document.createElement('div');
         wrapper.append(editor);
-        new Quill(editor, options);
-    })
+        const q = new Quill(editor, options);
+        setQuill(q);
+    }, [])
+
 
     return (
         <div id="container" ref={wrapperRef}></div>
