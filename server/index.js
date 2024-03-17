@@ -19,11 +19,13 @@ const io = new Server(httpServer, { cors: corsOption })
 
 io.on('connection', socket =>{
     
+    console.log("socket.id",socket.id);
+    socket.on('send-change', delta =>{
+        socket.broadcast.emit('receive-change',delta);
+    })
 
-
-    socket.on("disconnect", () => {
-		console.log("User Disconnected...!");
-	})
+    socket.on('get-docuemnt',getOrCreateDocument)
+    
 })
 
 
