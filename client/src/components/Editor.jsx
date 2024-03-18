@@ -82,7 +82,6 @@ export default function Editor() {
         if (quill == null || socket == null) return
 
         const interval = setInterval(() => {
-            console.log('Interval Time is ', INTERVAL_TIME)
             socket.emit('auto-save-document', quill.getContents())
 
             // INTERVAL_TIME = 10 * 60 * 100;

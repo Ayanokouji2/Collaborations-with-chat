@@ -23,9 +23,6 @@ const io = new Server(httpServer, { cors: corsOption })
 
 io.on('connection', socket => {
 
-    // console.log("socket.id", socket.id);
-
-
     socket.on('get-document', async documentId => {
 
         const document = await createNewOrGetOldDocument(documentId);
