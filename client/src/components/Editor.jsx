@@ -17,13 +17,14 @@ const ToolBar_Option = [
     ["clean"]
 ]
 
+const INTERVAL_TIME = 5 * 60 * 100; // 0.5 min or 30sec
 
 
 export default function Editor() {
-    const [socket, setSocket] = useState();
-    const [quill, setQuill] = useState();
+    const [socket, setSocket] = useState(null);
+    const [quill, setQuill] = useState(null);
 
-    const { id } = useParams();
+    const { id: documentId } = useParams();
 
     useEffect(() => {
         const s = io('http://localhost:5000/');
@@ -67,12 +68,32 @@ export default function Editor() {
     useEffect(() => {
         if (socket === null || quill == null) return
 
+        socket.once('load-document', document => {
+            quill.setContents(document);
+            quill.enable()
+        })
+
         socket.emit('get-document', documentId)
 
-        socket.once('load-document', docuemnt=>{
-            
-        })
+
     }, [socket, quill, documentId])
+
+    useEffect(() => {
+        if (quill == null || socket == null) return
+
+        const interval = setInterval(() => {
+            console.log('Interval Time is ', INTERVAL_TIME)
+            socket.emit('auto-save-document', quill.getContents())
+
+            // INTERVAL_TIME = 10 * 60 * 100;
+        }, INTERVAL_TIME)
+
+        return () => {
+            clearInterval(interval)
+        }
+
+    }, [socket, quill])
+
     const wrapperRef = useCallback(wrapper => {
 
         if (wrapper == null) return
@@ -90,6 +111,8 @@ export default function Editor() {
         const editor = document.createElement('div');
         wrapper.append(editor);
         const q = new Quill(editor, options);
+        q.setText('Your Document is Loading...!');
+        q.disable();
         setQuill(q);
     }, [])
 
