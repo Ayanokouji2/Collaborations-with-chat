@@ -31,8 +31,8 @@ io.on('connection', socket => {
         socket.emit('load-document',document.data);
 
         socket.on('auto-save-document', async data=>{
-           
             await updateDocument(documentId, data);
+            console.log('Document Save')
         })
 
         socket.on('send-change', delta => {

@@ -1,6 +1,6 @@
 import Quill from "quill"
 import 'quill/dist/quill.snow.css'
-import { useCallback, useState, useEffect } from "react"
+import { useCallback, useState, useEffect, useRef } from "react"
 import './Editor.css'
 import { io } from 'socket.io-client'
 import { useParams } from "react-router-dom"
@@ -25,6 +25,8 @@ export default function Editor() {
     const [quill, setQuill] = useState(null);
 
     const { id: documentId } = useParams();
+    const saveShortcutRef = useRef(null);
+
 
     useEffect(() => {
         const s = io('http://localhost:5000/');
@@ -93,6 +95,24 @@ export default function Editor() {
 
     }, [socket, quill])
 
+    // saveShortcut will have the latest value of saveShortcutRef
+    const saveShortcut = (...args) => saveShortcutRef.current(...args);
+
+    saveShortcutRef.current = useCallback(
+        (range, context) => {
+            if (quill == null || socket == null) {
+                console.error('Quill or socket is null:', quill, socket);
+                return;
+            }
+
+            socket.emit('auto-save-document', quill.getContents());
+        },
+        [quill, socket]
+    );
+
+
+
+
     const wrapperRef = useCallback(wrapper => {
 
         if (wrapper == null) return
@@ -101,6 +121,16 @@ export default function Editor() {
             // debug: 'info', // Makes constant log in the console for helping in debug
             modules: {
                 toolbar: ToolBar_Option,
+                keyboard: {
+                    bindings: {
+                        save: {
+                            key: 'S',
+                            ctrlKey: true,
+                            shiftKey: true,
+                            handler: saveShortcut
+                        }
+                    }
+                }
             },
             theme: 'snow'
         };
@@ -111,6 +141,7 @@ export default function Editor() {
         wrapper.append(editor);
 
         const q = new Quill(editor, options);
+
         q.setText('Your Document is Loading...!');
         q.disable();
         setQuill(q);
