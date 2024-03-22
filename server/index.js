@@ -45,10 +45,6 @@ io.on('connection', socket => {
 
 })
 
-
-
-
 httpServer.listen(PORT, () => {
     console.log(`Server is Listening in port http://localhost:${PORT}`);
 })
-

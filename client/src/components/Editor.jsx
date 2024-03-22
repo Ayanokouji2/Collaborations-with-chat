@@ -5,6 +5,7 @@ import './Editor.css'
 import { io } from 'socket.io-client'
 import { useParams } from "react-router-dom"
 
+
 const ToolBar_Option = [
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
     [{ font: [] }],
@@ -18,7 +19,6 @@ const ToolBar_Option = [
 ]
 
 const INTERVAL_TIME = 5 * 60 * 100; // 0.5 min or 30sec
-
 
 export default function Editor() {
     const [socket, setSocket] = useState(null);
@@ -98,7 +98,7 @@ export default function Editor() {
         if (wrapper == null) return
 
         const options = {
-            debug: 'info',
+            // debug: 'info', // Makes constant log in the console for helping in debug
             modules: {
                 toolbar: ToolBar_Option,
             },
@@ -109,6 +109,7 @@ export default function Editor() {
 
         const editor = document.createElement('div');
         wrapper.append(editor);
+
         const q = new Quill(editor, options);
         q.setText('Your Document is Loading...!');
         q.disable();
