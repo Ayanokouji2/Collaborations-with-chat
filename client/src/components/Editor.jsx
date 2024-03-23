@@ -146,7 +146,7 @@ export default function Editor() {
     }, [])
 
     /*
-        Collaboration
+        Collaboration - Attempt -1
 
         1. Login User to get Name  → redirect to select document to edit or create new Document 
         2. On Document’s Document(MonogDb) create a new Field called active User → when the user joins the room just insert the user in to the active user.
